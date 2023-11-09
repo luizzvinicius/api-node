@@ -1,0 +1,14 @@
+npm init -y
+
+npm i express
+
+npm i --save-dev @types/express
+npm i --save-dev @types/node
+npm i --save-dev ts-node
+tsc --init
+npm i --save-dev nodemon
+"dev": "nodemon src/App.js", (adicionar esse comando em scripts para que no nodemon funcione)
+
+Executar com npm run dev
+
+Dúvidas: https://vidafullstack.com.br/javascript/como-usar-typescript-com-nodejs-e-express/

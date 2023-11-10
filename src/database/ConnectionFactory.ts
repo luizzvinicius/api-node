@@ -1,4 +1,4 @@
-import { createConnection, Connection, QueryError, createPool, Pool } from "mysql2"
+import { createConnection, Connection, QueryError } from "mysql2"
 
 class ConnectionFactory {
     private conn: Connection

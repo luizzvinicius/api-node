@@ -10,22 +10,22 @@ function buscaId<T>(dados: Array<T>, predicate: (elem: T) => boolean): Array<T> 
     return filtrado
 }
 
-router.get("/", async (req: Request, res: Response) => {
+router.get("/", (req: Request, res: Response) => {
     new EstudanteDAO(ConnectionFactory.getConn).select(req, res)
 })
 
-router.post("/cadastro", async (req: Request, res: Response) => {
+router.post("/cadastro", (req: Request, res: Response) => {
     new EstudanteDAO(ConnectionFactory.getConn).insert(req, res)
 })
 
 router.route("/estudantes/:id")
-    .get(async (req: Request, res: Response) => {
+    .get((req: Request, res: Response) => {
         new EstudanteDAO(ConnectionFactory.getConn).select(req, res)
     })
-    .put(async (req: Request, res: Response) => {
+    .put((req: Request, res: Response) => {
         new EstudanteDAO(ConnectionFactory.getConn).update(req, res)
     })
-    .delete(async (req: Request, res: Response) => {
+    .delete((req: Request, res: Response) => {
         new EstudanteDAO(ConnectionFactory.getConn).delete(req, res)
     })
 

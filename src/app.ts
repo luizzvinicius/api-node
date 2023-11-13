@@ -1,6 +1,5 @@
 import "express-async-errors"
-import express, { NextFunction } from "express"
-import { Request, Response } from "express"
+import express, { Request, Response, NextFunction } from "express"
 import router from "./routes/router"
 
 export default class App {

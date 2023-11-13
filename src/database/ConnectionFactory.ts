@@ -1,31 +1,22 @@
-import { createConnection, Connection, QueryError } from "mysql2"
+import { Pool, createPool, PoolOptions } from "mysql2/promise"
 
 class ConnectionFactory {
-    private conn: Connection
+    private pool: Pool
 
     constructor() {
-        this.conn = createConnection({
+        const poolConfig: PoolOptions = {
             database: "node",
             host: "localhost",
             port: 3306,
             user: "root",
             password: "root",
-        })
+            connectionLimit: 10
+        }
+        this.pool = createPool(poolConfig)
     }
 
-    public connect(): boolean {
-        this.conn.connect((error: QueryError | null) => {
-            if (error) {
-                console.log(error, "Erro ao criar conexão")
-                return false
-            }
-            console.log("Conectado ao banco de dados!")
-        })
-        return true
-    }
-
-    get getConn(): Connection {
-        return this.conn
+    get getPool(): Pool {
+        return this.pool
     }
 }
 

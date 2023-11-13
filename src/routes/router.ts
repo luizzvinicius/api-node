@@ -10,23 +10,63 @@ function buscaId<T>(dados: Array<T>, predicate: (elem: T) => boolean): Array<T> 
     return filtrado
 }
 
-router.get("/", (req: Request, res: Response) => {
-    new EstudanteDAO(ConnectionFactory.getConn).select(req, res)
+router.get("/", async (req: Request, res: Response) => {
+    try {
+        const result = await new EstudanteDAO(ConnectionFactory.getPool).select(req, res)
+        if (result.length == 0) {
+            throw "Nenhum estudante encontrado"
+        }
+        res.status(200).json(result)
+    } catch (error) {
+        res.status(404).json({ message: error })
+    }
 })
 
-router.post("/cadastro", (req: Request, res: Response) => {
-    new EstudanteDAO(ConnectionFactory.getConn).insert(req, res)
+router.post("/cadastro", async (req: Request, res: Response) => {
+    try {
+        const result = await new EstudanteDAO(ConnectionFactory.getPool).insert(req, res)
+        if (result[0].affectedRows == 0) {
+            throw "Nenhuma linha afetada"
+        }
+        res.status(201).json({message: `${req.body.nome} inserido`})
+    } catch (error) {
+        res.status(400).json({ message: error })
+    }
 })
 
 router.route("/estudantes/:id")
-    .get((req: Request, res: Response) => {
-        new EstudanteDAO(ConnectionFactory.getConn).select(req, res)
+    .get(async (req: Request, res: Response) => {
+        try {
+            const result = await new EstudanteDAO(ConnectionFactory.getPool).select(req, res)
+            if (result.length == 0) {
+                throw "Nenhum estudante encontrado"
+            }
+            res.status(200).json(result)
+        } catch (error) {
+            res.status(404).json({ message: error })
+        }
     })
-    .put((req: Request, res: Response) => {
-        new EstudanteDAO(ConnectionFactory.getConn).update(req, res)
+    .put(async (req: Request, res: Response) => {
+        try {
+            const result = await new EstudanteDAO(ConnectionFactory.getPool).update(req, res)
+            if (result[0].affectedRows == 0) {
+                throw "Nenhuma linha afetada"
+            }
+            res.status(200).json({ message: "Nota atualizada" })
+        } catch (error) {
+            res.status(400).json({ message: error })
+        }
     })
-    .delete((req: Request, res: Response) => {
-        new EstudanteDAO(ConnectionFactory.getConn).delete(req, res)
+    .delete(async (req: Request, res: Response) => {
+        try {
+            const result = await new EstudanteDAO(ConnectionFactory.getPool).delete(req, res)
+            if (result[0].affectedRows == 0) {
+                throw "Nenhuma linha afetada"
+            }
+            res.status(200).json({ message: "Estudante excluído" })
+        } catch (error) {
+            res.status(400).json({ message: error })
+        }
     })
 
 export default router

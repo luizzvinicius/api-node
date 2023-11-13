@@ -1,58 +1,60 @@
 import { Request, Response } from "express"
-import { Connection, QueryError } from "mysql2"
+import { Pool } from "mysql2/promise"
 
 class EstudanteDAO {
-    private conn: Connection
+    private pool: Pool
 
-    constructor(conn: Connection) {
-        this.conn = conn
+    constructor(pool: Pool) {
+        this.pool = pool
     }
 
-    public insert(req: Request, res: Response): void {
+    public async insert(req: Request, res: Response): Promise<any> {
         const SQL = "insert into estudante (nome, nota) values (?, ?)"
-        this.conn.query(SQL, [req.body.nome, req.body.nota], (error: QueryError | null, result: any) => {
-            if (error || result.affectedRows == 0) {
-                res.status(400).json({ message: "Erro ao cadastrar estudante" })
-                return
-            }
-            res.status(201).json({ message: `${req.body.nome} cadastrado` })
-        })
+        let { nome, nota } = req.body
+        let result: any
+        try {
+            const conn = await this.pool.getConnection()
+            result = await conn.query(SQL, [nome, nota])
+        } catch (error) {
+            res.status(400).json({ errorDAO: error })
+        }
+        return result
     }
 
-    public select(req: Request, res: Response): void {
-        const sql = req.params.id == undefined ? "SELECT * FROM estudante" : "SELECT * FROM estudante where id = ?"
-        this.conn.promise()
-        this.conn.query(sql, [req.params.id], (error: QueryError | null, result: any) => {
-            if (error || result.length == 0) {
-                res.status(404).json({ erro: "erro ao consultar estudantes", details: error })
-            }
-            res.status(200).send(result)
-        })
+    public async select(req: Request, res: Response): Promise<[]> {
+        const SQL = req.params.id == undefined ? "SELECT * FROM estudante" : "SELECT * FROM estudante where id = ?"
+        let result: any
+        try {
+            const conn = await this.pool.getConnection()
+            result = await conn.query(SQL, [req.params.id])
+        } catch (error) {
+            res.status(404).json({ erroDAO: error })
+        }
+        return result[0]
     }
 
-    public update(req: Request, res: Response): void {
-        const id = Number.parseInt(req.params.id)
-        const nota = Number.parseFloat(req.body.nota)
+    public async update(req: Request, res: Response): Promise<any> {
         const SQL = "update estudante set nota = ? where id = ?"
-        this.conn.query(SQL, [nota, id], (error: QueryError | null, result: any) => {
-            if (error || result.affectedRows == 0) {
-                res.status(400).json({ message: "Nenhuma linha afetada", erro: error })
-                return
-            }
-            res.status(200).json({ message: 'Nota atualizada' })
-        })
+        let result: any
+        try {
+            const conn = await this.pool.getConnection()
+            result = await conn.query(SQL, [req.body.nota, req.params.id])
+        } catch (error) {
+            res.status(400).json({ erroDAO: error })
+        }
+        return result
     }
 
-    public delete(req: Request, res: Response): void {
-        const id = Number.parseInt(req.params.id)
+    public async delete(req: Request, res: Response): Promise<any> {
         const SQL = "delete from estudante where id = ?"
-        this.conn.query(SQL, [id], (error: QueryError | null, result: any) => {
-            if (error || result.affectedRows == 0) {
-                res.status(400).json({ message: "Nenhuma linha afetada", erro: error })
-                return
-            }
-            res.status(201).json({ message: 'estudante excluído' })
-        })
+        let result: any
+        try {
+            const conn = await this.pool.getConnection()
+            result = await conn.query(SQL, [req.params.id])
+        } catch (error) {
+            res.status(404).json({ erroDAO: error })
+        }
+        return result
     }
 }
 
